@@ -12,14 +12,9 @@ HTML_DIRECTORY = "html"
 DEBUG = 1
 
 
-def http_post(url, body, headers):
-    response = requests.post(url=url, data=body, headers=headers)
-    return response if response.status_code == 200 else print("The status code of the post was ", response.status_code)
-
-
 def http_get(url, body, headers):
     response = requests.get(url=url, data=body, headers=headers)
-    return response if response.status_code == 200 else print("The status code of the post was ", response.status_code)
+    return response if response.status_code == 200 else print("status code http_get:", response.status_code)
 
 
 def current_date():
@@ -80,34 +75,22 @@ def add_runtime_to_showtime(showtime, runtime_in_minues):
     :param runtime_in_minues: integer
     :return: new time stamp in 2018-06-04T00:00:00 with the minutes added
     """
-    new_time_stamp = datetime.datetime.strptime(showtime, "%Y-%m-%dT%H:%M:%S") + datetime.timedelta(minutes=runtime_in_minues)
-    return new_time_stamp.strftime("%Y-%m-%dT%H:%M:%S")
+    return (datetime.datetime.strptime(showtime, "%Y-%m-%dT%H:%M:%S") + datetime.timedelta(minutes=runtime_in_minues)).strftime("%Y-%m-%dT%H:%M:%S")
 
 
 def get_now_showing_sessions():
-    url = 'http://vista.studiomoviegrill.com/WSVistaWebClient/OData.svc/GetNowShowingSessions'
-    body = {"siteGroupId": "0009"}
-    headers = {'Accept': 'application/json'}
+    url, body, headers = 'http://vista.studiomoviegrill.com/WSVistaWebClient/OData.svc/GetNowShowingSessions', {"siteGroupId": "0009"},  {'Accept': 'application/json'}
     return http_get(url, body, headers).text
 
 
 def get_now_showing_scheduled_films():
-    url = 'http://vista.studiomoviegrill.com/WSVistaWebClient/OData.svc/GetNowShowingScheduledFilms'
-    body = {}
-    headers = {'Accept': 'application/json'}
+    url, body, headers = 'http://vista.studiomoviegrill.com/WSVistaWebClient/OData.svc/GetNowShowingScheduledFilms', {}, {'Accept': 'application/json'}
     return http_get(url, body, headers).text
-
-
-def ensure_directory_exists(directory):
-    os.makedirs(os.path.dirname(directory), exist_ok=True)
-    return
 
 
 def remove_old_html_pages():
     directory = os.listdir(HTML_DIRECTORY)
-    for files in directory:
-        if files.endswith(".html"):
-            os.remove(os.path.join(HTML_DIRECTORY, files))
+    [os.remove(os.path.join(HTML_DIRECTORY, files)) for files in directory if files.endswith(".html")]
 
 
 def write_html_content_to_file(theater, location, scheduled_film_id, show_time_start, show_time_end, run_time, title, url):
@@ -197,16 +180,16 @@ def write_html_content_to_file(theater, location, scheduled_film_id, show_time_s
 def generate_html_pages(now_showing_sessions, now_showing_scheduled_films, location):
     print("%-8s %-8s %-15s %-20s %-20s %-8s %-40s %-60s" % ("Theater", "Location", "ScheduledFilmId",  "ShowtimeStart", "ShowtimeEnd", "RunTime", "Title", "URL")) if DEBUG else ""
     for items in now_showing_sessions:
-        Theater = items["ScreenNumber"]
-        Title = return_matching_object(now_showing_scheduled_films, "ScheduledFilmId", items["ScheduledFilmId"])['Title']
-        ShowtimeStart = items["Showtime"]
-        RunTime = return_matching_object(now_showing_scheduled_films, "ScheduledFilmId", items["ScheduledFilmId"])['RunTime']
-        ShowtimeEnd = add_runtime_to_showtime(items["Showtime"], int(RunTime))
-        ScheduledFilmId = items["ScheduledFilmId"]
+        theater = items["ScreenNumber"]
+        title = return_matching_object(now_showing_scheduled_films, "ScheduledFilmId", items["ScheduledFilmId"])['Title']
+        showtimestart = items["Showtime"]
+        run_time = return_matching_object(now_showing_scheduled_films, "ScheduledFilmId", items["ScheduledFilmId"])['RunTime']
+        showtimeend = add_runtime_to_showtime(items["Showtime"], int(run_time))
+        scheduled_film_id = items["ScheduledFilmId"]
 
-        URL = "http://srv001.vista.smg" + str(location[1:]) + ".studiomoviegrill.com/Cinema-CDN/Image/Entity/FilmTitleGraphic/h-" + ScheduledFilmId
-        print("%-8s %-8s %-15s %-20s %-20s %-8s %-40s %-60s" % (Theater, location,  ScheduledFilmId, ShowtimeStart, ShowtimeEnd, RunTime, Title, URL)) if DEBUG else ""
-        write_html_content_to_file(Theater, location, ScheduledFilmId, ShowtimeStart, ShowtimeEnd,  RunTime, Title, URL,)
+        URL = "http://srv001.vista.smg" + str(location[1:]) + ".studiomoviegrill.com/Cinema-CDN/Image/Entity/FilmTitleGraphic/h-" + scheduled_film_id
+        print("%-8s %-8s %-15s %-20s %-20s %-8s %-40s %-60s" % (theater, location,  scheduled_film_id, showtimestart, showtimeend, run_time, title, URL)) if DEBUG else ""
+        write_html_content_to_file(theater, location, scheduled_film_id, showtimestart, showtimeend,  run_time, title, URL)
 
 
 def usage():
@@ -217,12 +200,7 @@ def usage():
 
 
 def main():
-    location, theater = "", ""
-    if len(sys.argv) == 3:
-        location, theater = sys.argv[1], int(sys.argv[2])
-    else:
-        usage()
-
+    location, theater = sys.argv[1], int(sys.argv[2]) if len(sys.argv) == 3 else usage()
     usage() if len(location) != 4 else ""
 
     """ Filter by Location Number, Business Date, and Theater Number """
