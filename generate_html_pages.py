@@ -204,12 +204,11 @@ def usage():
 
 
 def main():
+    location, theater = None, None
     try:
-        location, theater = sys.argv[1], int(sys.argv[2]) if len(sys.argv) == 3 else usage()
+        location, theater = sys.argv[1], int(sys.argv[2]) if len(sys.argv) == 3 and sys.argv[1].isdigit() and len(sys.argv[1]) == 4 and sys.argv[2].isdigit() else usage()
     except IndexError:
         usage()
-
-    usage() if len(location) != 4 else ""
 
     """ Filter by Location Number, Business Date, and Theater Number """
 
