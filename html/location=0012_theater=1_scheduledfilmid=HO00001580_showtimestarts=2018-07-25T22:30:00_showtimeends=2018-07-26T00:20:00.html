@@ -1,0 +1,77 @@
+<!doctype html>
+    <html lang="en">
+       <head>
+          <!-- Required meta tags -->
+          <meta charset="utf-8">
+          <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+          <!-- Bootstrap CSS -->
+          <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
+          <title>Studio Movie Grill</title>
+       </head>
+       <body>
+          <div class="container-fluid bg-dark">
+             <div class="row">
+                <div class="col-sm-3 bg-dark border-right text-white">
+                   <p style="font-size:100px" class="text-center">1</p>
+                </div>
+                <div class="col-sm-9 bg-dark text-white">
+                   <p></p>
+                   <p style="font-size:35px">MAMMA MIA! HERE WE GO AGAIN</p>
+                   <h2>10:30 PM</h2>
+                   <p></p>
+                </div>
+             </div>
+          </div>
+          <div class="containter-fluid">
+             <div class="row">
+                <div class="col-sm-12 img-responsive">
+                   <img src="http://srv001.vista.smg012.studiomoviegrill.com/Cinema-CDN/Image/Entity/FilmTitleGraphic/h-HO00001580" class="img-fluid w-100">
+                </div>
+             </div>
+          </div>
+          <div class="containter-fluid">
+             <div class = "row">
+                <div style="height:100px" class="col-sm-6 bg-dark text-white">
+                   <p id="demo2" style="font-size:35px" class="text-right">Starting in</p>
+                </div>
+                <div style="height:100px" class="col-sm-6 bg-dark text-white">
+                   <p id="demo" style="font-size:35px" class="text-left"></p>
+                </div>
+             </div>
+          </div>
+          <!-- Optional JavaScript -->
+          <!-- jQuery first, then Popper.js, then Bootstrap JS -->
+          <script src="./scripts/jquery-3.2.1.slim.min.js"></script>
+          <script src="./scripts/popper.min.js"></script>
+          <script src="./scripts/bootstrap.min.js"></script>
+          <script>
+             // Set the date we're counting down to
+             var countDownDate = new Date().getTime() + 10000;
+
+             // Update the count down every 1 second
+             var x = setInterval(function() {
+
+             // Get todays date and time
+             var now = new Date().getTime();
+
+             // Find the distance between now an the count down date
+             var distance = countDownDate - now;
+
+             // Time calculations for days, hours, minutes and seconds
+             var days = Math.floor(distance / (1000 * 60 * 60 * 24));
+             var hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+             var minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
+             var seconds = Math.floor((distance % (1000 * 60)) / 1000);
+
+             // Output the result in an element with id="demo"
+             document.getElementById("demo").innerHTML =  hours.toString().padStart(2, "0") + ":" + minutes.toString().padStart(2, "0") + ":" + seconds.toString().padStart(2, "0") ;
+
+             // If the count down is over, write some text
+             if (distance < 1000) {
+                 countDownDate = new Date().getTime() + (1000 * 60 * 110);
+                 document.getElementById("demo2").innerHTML = "Ending in";
+             }
+             }, 1000);
+        </script>
+    </body>
+    </html>
