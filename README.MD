@@ -5,6 +5,11 @@
 ./generate_html_pages.py [4-digit-location-code] [theater-number]
 ./generate_html_pages.py 0009 1
 ```
+```bash
+# The binary builds can also be used instead
+build/linux/generate_html_pages 0337 3
+build/macos/generate_html_pages 0012 5
+```
 
 ##### Results
 ```bash

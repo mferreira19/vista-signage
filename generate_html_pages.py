@@ -14,7 +14,10 @@ DEBUG = 1
 
 def http_get(url, body, headers):
     response = requests.get(url=url, data=body, headers=headers)
-    return response if response.status_code == 200 else print("status code http_get:", response.status_code)
+    if response.status_code == 200:
+        return response
+    else:
+        print("status code http_get:", response.status_code)
 
 
 def current_date():
