@@ -28,3 +28,9 @@ pip3 install requests
 sudo apt-get install python3
 pip3 install requests
 ```
+
+##### Generating a binary
+```
+pip3 install pyinstaller
+pyinstaller --onefile generate_html_pages.py
+```
