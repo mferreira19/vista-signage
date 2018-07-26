@@ -6,7 +6,7 @@ super secret TV project
 QuantumIOT, 2018
 """
 
-import sys, os, datetime, json, requests, time
+import sys, os, datetime, json, requests, time, pathlib
 
 HTML_DIRECTORY = "html"
 DEBUG = 1
@@ -91,6 +91,10 @@ def get_now_showing_scheduled_films():
 def remove_old_html_pages():
     directory = os.listdir(HTML_DIRECTORY)
     [os.remove(os.path.join(HTML_DIRECTORY, files)) for files in directory if files.endswith(".html")]
+
+
+def ensure_directory_exists(directory):
+    pathlib.Path(directory).mkdir(parents=True, exist_ok=True)
 
 
 def write_html_content_to_file(theater, location, scheduled_film_id, show_time_start, show_time_end, run_time, title, url):
@@ -193,21 +197,27 @@ def generate_html_pages(now_showing_sessions, now_showing_scheduled_films, locat
 
 
 def usage():
-    print("Please try again with a location code and theater number")
+    print("Please try again with a 4 digit location code and a theater number")
     print("USAGE  : ./generate_html_pages.py <4-digit-location-code> <theater-number>")
     print("example: ./generate_html_pages.py 0009 1")
     sys.exit(1)
 
 
 def main():
-    location, theater = sys.argv[1], int(sys.argv[2]) if len(sys.argv) == 3 else usage()
+    try:
+        location, theater = sys.argv[1], int(sys.argv[2]) if len(sys.argv) == 3 else usage()
+    except IndexError:
+        usage()
+
     usage() if len(location) != 4 else ""
 
     """ Filter by Location Number, Business Date, and Theater Number """
 
     sessions_by_location_theater_date = filter_dict(filter_dict(filter_dict(json.loads(get_now_showing_sessions())["value"], 'CinemaId', location), 'SessionBusinessDate', current_date()), 'ScreenNumber', theater)
-    
+
     scheduled_films_filtered_by_location = filter_dict(json.loads(get_now_showing_scheduled_films())['value'], "CinemaId", location)
+
+    ensure_directory_exists(HTML_DIRECTORY)
 
     remove_old_html_pages()
 
